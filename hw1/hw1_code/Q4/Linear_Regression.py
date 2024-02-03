@@ -2,6 +2,7 @@ import numpy as np
 import json
 import collections
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 
 
 np.random.seed(42)  ## random seed fixed
@@ -48,81 +49,87 @@ def closed_form(X, y):
 
 
 def gradient_descent(X, y, lr_set, N_iteration):
-    """
-    Implement gradient descent on the square-error given dataset (X, y) for each learning rate in lr_set.
-    Inputs:
-    - X: dataset of size (n, d)
-    - y: label of size (n, 1)
-    - lr_set: a list of learning rates
-    - N_iteration: the number of iterations
-    Returns:
-    - a plot with k curves where k is the length of lr_set
-    - each curve contains 20 data points, in which the i-th data point represents the total squared-error
-            with respect to the i-th iteration
-    - You can print the final objective value within this function to show the performance of the best step size
-    """
-    min_losses = []
-    for lr in lr_set:
-        w = np.zeros((d, 1))
-        loss_history = []
-        for iter in range(N_iteration):
-            tse = square_loss(w, X, y)
-            gradient = X.T.dot(X).dot(w) - X.T.dot(y)
-            w = w - lr * gradient
-            loss_history.append((iter, tse))
-        iterations, losses = zip(*loss_history)
-        min_losses.append(losses[-1])
-        plt.plot(iterations, losses, label=f"LR={lr}")
+  """
+  Implement gradient descent on the square-error given dataset (X, y) for each learning rate in lr_set.
+  Inputs:
+  - X: dataset of size (n, d)
+  - y: label of size (n, 1)
+  - lr_set: a list of learning rates
+  - N_iteration: the number of iterations
+  Returns:
+  - a plot with k curves where k is the length of lr_set
+  - each curve contains 20 data points, in which the i-th data point represents the total squared-error
+    with respect to the i-th iteration
+  - You can print the final objective value within this function to show the performance of the best step size
+  """
+  min_losses = []
+  fig, axes = plt.subplots(1, len(lr_set), figsize=(15, 5))
+  for index, lr in enumerate(lr_set):
+    w = np.zeros((d,1))
+    loss_history = []
+    for iter in range(N_iteration):
+      # tse = square_loss(w, X, y)
+      gradient = 2 * (X.T.dot(X).dot(w) - X.T.dot(y))
+      w = w - lr * gradient
+      # loss_history.append((iter, tse))
+      loss_history.append(square_loss(w, X_test, y_test))
+    min_losses.append(loss_history[-1])
+    axes[index].plot(range(1, N_iteration + 1), loss_history, label=f'LR={lr}')
+    axes[index].set_xlabel('Iteration')
+    axes[index].set_ylabel('Total Squared Error')
+    axes[index].set_title(f'Learning Rate: {lr}')
+    axes[index].legend()
+    axes[index].xaxis.set_major_locator(MaxNLocator(integer=True))
 
-    plt.xlabel("Iteration")
-    plt.ylabel("Total Squared Error")
-    plt.title("Gradient Descent Optimization")
-    plt.legend()
-    plt.show()
+  plt.suptitle('Gradient Descent Optimization', fontsize=16)
+  plt.tight_layout()
+  plt.show()
 
-    min_losses = np.array(min_losses)
-    print(f"final objective value: {np.min(min_losses)}")
-    print(f"best step size: {lr_set[np.argmin(min_losses)]}")
+  min_losses = np.array(min_losses)
+  print(f'final objective value: {np.min(min_losses)}')
+  print(f'best step size: {lr_set[np.argmin(min_losses)]}')
 
 
-def stochastic_gradient_descent(X, y, lr_set, N_iteration):
-    """
-    Implement gradient descent on the square-error given dataset (X,y) and for each learning rate in lr_set
-    Inputs:
-    - X: dataset of size (n,d)
-    - y: label of size (n,1)
-    - lr_set: a list of learning rate.
-    - N_itertion: the number of iterations
-    Returns:
-    - a plot with k curves where k is the length of lr_set.
-    - each curve contains 1000 data points, in which the i-th data point represents the total squared-error with respect to the i-th iteration
-    - You can print the final objective value within this function to show the performance of best step size
-    """
-    np.random.seed(1)  # Use this fixed random_seed in sampling
-    np.random.seed(1)  # Use this fixed random_seed in sampling
-    min_losses = []
-    for lr in lr_set:
-        w = np.zeros((d, 1))
-        loss_history = []
-        for iter in range(N_iteration):
-            i = np.random.randint(n)
-            tse = square_loss(w, X, y)
-            gradient = (np.dot(X[i], w) - y[i]) * X[i].reshape(-1, 1)
-            w = w - lr * gradient
-            loss_history.append((iter, tse))
-        iterations, losses = zip(*loss_history)
-        min_losses.append(losses[-1])
-        plt.plot(iterations, losses, label=f"LR={lr}")
+def stochastic_gradient_descent(X,y,lr_set,N_iteration):
+  """
+  Implement gradient descent on the square-error given dataset (X,y) and for each learning rate in lr_set
+  Inputs:
+  - X: dataset of size (n,d)
+  - y: label of size (n,1)
+  - lr_set: a list of learning rate.
+  - N_itertion: the number of iterations
+  Returns:
+  - a plot with k curves where k is the length of lr_set.
+  - each curve contains 1000 data points, in which the i-th data point represents the total squared-error with respect to the i-th iteration
+  - You can print the final objective value within this function to show the performance of best step size
+  """
+  np.random.seed(1) # Use this fixed random_seed in sampling
+  min_losses = []
+  fig, axes = plt.subplots(1, len(lr_set), figsize=(15, 5))
+  for index, lr in enumerate(lr_set):
+    w = np.zeros((d,1))
+    loss_history = []
+    for iter in range(N_iteration):
+      i = np.random.randint(n)
+      # tse = square_loss(w, X, y)
+      gradient = 2 * (np.dot(X[i], w) - y[i]) * X[i].reshape(-1, 1)
+      w = w - lr * gradient
+      # loss_history.append((iter, tse))
+      loss_history.append(square_loss(w, X_test, y_test))
+    min_losses.append(loss_history[-1])
+    axes[index].plot(range(1, N_iteration + 1), loss_history, label=f'LR={lr}')
+    axes[index].set_xlabel('Iteration')
+    axes[index].set_ylabel('Total Squared Error')
+    axes[index].set_title(f'Learning Rate: {lr}')
+    axes[index].legend()
 
-    plt.xlabel("Iteration")
-    plt.ylabel("Total Squared Error")
-    plt.title("Stochastic Gradient Descent Optimization")
-    plt.legend()
-    plt.show()
+  plt.suptitle('Stochastic Gradient Descent Optimization', fontsize=16)
+  plt.tight_layout()
+  plt.show()
 
-    min_losses = np.array(min_losses)
-    print(f"final objective value: {np.min(min_losses)}")
-    print(f"best step size: {lr_set[np.argmin(min_losses)]}")
+  min_losses = np.array(min_losses)
+  print(f'final objective value: {np.min(min_losses)}')
+  print(f'best step size: {lr_set[np.argmin(min_losses)]}')
 
 
 def main():
