@@ -150,9 +150,9 @@ def main():
     N_iter = 20
     gradient_descent(X, y, lr_set, N_iter)
     # a high lr may overshoot the minimum, causing divergence
-    # a low hr may cause slow convergence and risk getting stuck in local minimum
+    # a low lr may cause slow convergence and risk getting stuck in local minimum
     # a optimal lr achieves a balance, ensuring efficient and stable convergence
-    # best step size is 0.0007 and objective function value is 217.48462429057832
+    # best step size is 0.0005 and objective function value is 294.1191567177276
 
     ### Problem 4.3 (Stochastic Gradient Descent) ###
     ### You can plot more options of lr_set if necessary
@@ -161,8 +161,8 @@ def main():
     stochastic_gradient_descent(X, y, lr_set, N_iter)
     # effect of lr on convergence is generally similar to that of gradient descent
     # effect of same lr on convergence is not as strong as gradient descent
-    # gd use each data point N_iter times, sgd use each data point [0, N_iter] times
-    # best step size is 0.005 and objective function value is 393.3714309232492
+    # gd use each data point N_iter times, sgd use each data point N_iter/n times on average
+    # best step size is 0.005 and objective function value is 467.0480113466759
 
 
 if __name__ == "__main__":
